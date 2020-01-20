@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="904d79de-3f37-4b03-8235-ac970fd8fad9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/memstore/table/ColumnTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memstore/table/ColumnTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memstore/table/IndexedRowTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memstore/table/IndexedRowTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memstore/table/RowTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memstore/table/RowTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memstore/table/CustomTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memstore/table/CustomTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/META-INF/BenchmarkList" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/META-INF/BenchmarkList" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/memstore/table/CustomTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/memstore/table/CustomTable.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,6 +15,9 @@
   </component>
   <component name="CodeStyleSettingsInfer">
     <option name="done" value="true" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="455" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -127,22 +132,22 @@
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
     <state x="880" y="352" key="#Project_Structure/0.23.2560.1325@0.23.2560.1325" timestamp="1579558119615" />
-    <state width="2518" height="464" key="GridCell.Tab.0.bottom" timestamp="1579558275809">
+    <state width="2518" height="378" key="GridCell.Tab.0.bottom" timestamp="1579563822637">
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
-    <state width="2518" height="464" key="GridCell.Tab.0.bottom/0.23.2560.1325@0.23.2560.1325" timestamp="1579558275809" />
-    <state width="2518" height="464" key="GridCell.Tab.0.center" timestamp="1579558275808">
+    <state width="2518" height="378" key="GridCell.Tab.0.bottom/0.23.2560.1325@0.23.2560.1325" timestamp="1579563822637" />
+    <state width="2518" height="378" key="GridCell.Tab.0.center" timestamp="1579563822636">
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
-    <state width="2518" height="464" key="GridCell.Tab.0.center/0.23.2560.1325@0.23.2560.1325" timestamp="1579558275808" />
-    <state width="2518" height="464" key="GridCell.Tab.0.left" timestamp="1579558275808">
+    <state width="2518" height="378" key="GridCell.Tab.0.center/0.23.2560.1325@0.23.2560.1325" timestamp="1579563822636" />
+    <state width="2518" height="378" key="GridCell.Tab.0.left" timestamp="1579563822635">
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
-    <state width="2518" height="464" key="GridCell.Tab.0.left/0.23.2560.1325@0.23.2560.1325" timestamp="1579558275808" />
-    <state width="2518" height="464" key="GridCell.Tab.0.right" timestamp="1579558275809">
+    <state width="2518" height="378" key="GridCell.Tab.0.left/0.23.2560.1325@0.23.2560.1325" timestamp="1579563822635" />
+    <state width="2518" height="378" key="GridCell.Tab.0.right" timestamp="1579563822636">
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
-    <state width="2518" height="464" key="GridCell.Tab.0.right/0.23.2560.1325@0.23.2560.1325" timestamp="1579558275809" />
+    <state width="2518" height="378" key="GridCell.Tab.0.right/0.23.2560.1325@0.23.2560.1325" timestamp="1579563822636" />
     <state width="2518" height="464" key="GridCell.Tab.1.bottom" timestamp="1579558275809">
       <screen x="0" y="23" width="2560" height="1325" />
     </state>
@@ -161,6 +166,6 @@
     <state width="2518" height="464" key="GridCell.Tab.1.right/0.23.2560.1325@0.23.2560.1325" timestamp="1579558275809" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/cs245_as1$All_in_cs245_as1.ic" NAME="All in cs245-as1 Coverage Results" MODIFIED="1579558287111" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/cs245_as1$All_in_cs245_as1.ic" NAME="All in cs245-as1 Coverage Results" MODIFIED="1579563822612" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

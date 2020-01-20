@@ -1,13 +1,22 @@
 package memstore.table;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import memstore.data.ByteFormat;
 import memstore.data.DataLoader;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Custom table implementation to adapt to provided query mix.
  */
 public class CustomTable implements Table {
+    int numCols;
+    int numRows;
+    private TreeMap<Integer, IntArrayList> index;
+    private ByteBuffer columns;
 
     public CustomTable() { }
 
@@ -19,7 +28,25 @@ public class CustomTable implements Table {
      */
     @Override
     public void load(DataLoader loader) throws IOException {
-        // TODO: Implement this!
+        this.numCols = loader.getNumCols();
+        List<ByteBuffer> rows = loader.getRows();
+        numRows = rows.size();
+        this.columns = ByteBuffer.allocate(ByteFormat.FIELD_LEN*numRows*numCols);
+        this.index = new TreeMap<>();
+
+        for (int rowId = 0; rowId < numRows; rowId++) {
+            ByteBuffer curRow = rows.get(rowId);
+            for (int colId = 0; colId < numCols; colId++) {
+                int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
+                int value = curRow.getInt(ByteFormat.FIELD_LEN*colId);
+                this.columns.putInt(offset, value);
+
+                if (colId == 0) {
+                    index.putIfAbsent(value, new IntArrayList());
+                    index.get(value).add(rowId);
+                }
+            }
+        }
     }
 
     /**
@@ -27,8 +54,8 @@ public class CustomTable implements Table {
      */
     @Override
     public int getIntField(int rowId, int colId) {
-        // TODO: Implement this!
-        return 0;
+        int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
+        return columns.getInt(offset);
     }
 
     /**
@@ -36,7 +63,16 @@ public class CustomTable implements Table {
      */
     @Override
     public void putIntField(int rowId, int colId, int field) {
-        // TODO: Implement this!
+        int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
+
+        if (colId == 0) {
+            int value = columns.getInt(offset);
+            index.get(value).rem(rowId);
+            if (index.get(value).isEmpty()) index.remove(value);
+            index.putIfAbsent(field, new IntArrayList());
+            index.get(field).add(rowId);
+        }
+        columns.putInt(offset, field);
     }
 
     /**
@@ -47,8 +83,11 @@ public class CustomTable implements Table {
      */
     @Override
     public long columnSum() {
-        // TODO: Implement this!
-        return 0;
+        long sum = 0;
+        for (int value : index.keySet()) {
+            sum += value * index.get(value).size();
+        }
+        return sum;
     }
 
     /**
@@ -60,8 +99,14 @@ public class CustomTable implements Table {
      */
     @Override
     public long predicatedColumnSum(int threshold1, int threshold2) {
-        // TODO: Implement this!
-        return 0;
+        long sum = 0;
+        for (int rowId = 0; rowId < numRows; rowId++) {
+            if (getIntField(rowId, 1) <= threshold1 || getIntField(rowId, 2) >= threshold2) {
+                continue;
+            }
+            sum += getIntField(rowId, 0);
+        }
+        return sum;
     }
 
     /**
@@ -72,8 +117,15 @@ public class CustomTable implements Table {
      */
     @Override
     public long predicatedAllColumnsSum(int threshold) {
-        // TODO: Implement this!
-        return 0;
+        long sum = 0;
+        for (IntArrayList iter : index.tailMap(threshold + 1).values()) {
+            for (int rowId : iter) {
+                for (int colId = 0; colId < numCols; colId++) {
+                    sum += getIntField(rowId, colId);
+                }
+            }
+        }
+        return sum;
     }
 
     /**
@@ -84,8 +136,14 @@ public class CustomTable implements Table {
      */
     @Override
     public int predicatedUpdate(int threshold) {
-        // TODO: Implement this!
-        return 0;
+        int updatedRows = 0;
+        for (IntArrayList iter : index.headMap(threshold).values()) {
+            updatedRows += iter.size();
+            for (int rowId : iter) {
+                putIntField(rowId, 3, getIntField(rowId, 2) + getIntField(rowId, 3));
+            }
+        }
+        return updatedRows;
     }
 
 }
