@@ -15,8 +15,10 @@ import java.util.TreeMap;
 public class CustomTable implements Table {
     int numCols;
     int numRows;
-    private TreeMap<Integer, IntArrayList> index;
-    private ByteBuffer columns;
+    private ByteBuffer rows;
+
+    private int[] rowSums;
+    private int col0Sum;
 
     public CustomTable() { }
 
@@ -31,21 +33,23 @@ public class CustomTable implements Table {
         this.numCols = loader.getNumCols();
         List<ByteBuffer> rows = loader.getRows();
         numRows = rows.size();
-        this.columns = ByteBuffer.allocate(ByteFormat.FIELD_LEN*numRows*numCols);
-        this.index = new TreeMap<>();
+        this.rows = ByteBuffer.allocate(ByteFormat.FIELD_LEN * numRows * numCols);
+        this.rowSums = new int[numRows];
+        this.col0Sum = 0;
 
         for (int rowId = 0; rowId < numRows; rowId++) {
             ByteBuffer curRow = rows.get(rowId);
+            int rowSum = 0;
             for (int colId = 0; colId < numCols; colId++) {
-                int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
-                int value = curRow.getInt(ByteFormat.FIELD_LEN*colId);
-                this.columns.putInt(offset, value);
-
+                int offset = ByteFormat.FIELD_LEN * ((rowId * numCols) + colId);
+                int value = curRow.getInt(ByteFormat.FIELD_LEN * colId);
+                this.rows.putInt(offset, value);
+                rowSum += value;
                 if (colId == 0) {
-                    index.putIfAbsent(value, new IntArrayList());
-                    index.get(value).add(rowId);
+                    col0Sum += value;
                 }
             }
+            rowSums[rowId] = rowSum;
         }
     }
 
@@ -54,8 +58,8 @@ public class CustomTable implements Table {
      */
     @Override
     public int getIntField(int rowId, int colId) {
-        int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
-        return columns.getInt(offset);
+        int offset = ByteFormat.FIELD_LEN * ((rowId * numCols) + colId);
+        return rows.getInt(offset);
     }
 
     /**
@@ -63,16 +67,14 @@ public class CustomTable implements Table {
      */
     @Override
     public void putIntField(int rowId, int colId, int field) {
-        int offset = ByteFormat.FIELD_LEN * ((colId * numRows) + rowId);
-
+        int offset = ByteFormat.FIELD_LEN * ((rowId * numCols) + colId);
+        int oldVal = rows.getInt(offset);
+        if (oldVal == field) return;
+        rowSums[rowId] += field - oldVal;
         if (colId == 0) {
-            int value = columns.getInt(offset);
-            index.get(value).rem(rowId);
-            if (index.get(value).isEmpty()) index.remove(value);
-            index.putIfAbsent(field, new IntArrayList());
-            index.get(field).add(rowId);
+            col0Sum += field - oldVal;
         }
-        columns.putInt(offset, field);
+        rows.putInt(offset, field);
     }
 
     /**
@@ -83,11 +85,7 @@ public class CustomTable implements Table {
      */
     @Override
     public long columnSum() {
-        long sum = 0;
-        for (int value : index.keySet()) {
-            sum += value * index.get(value).size();
-        }
-        return sum;
+        return col0Sum;
     }
 
     /**
@@ -118,12 +116,11 @@ public class CustomTable implements Table {
     @Override
     public long predicatedAllColumnsSum(int threshold) {
         long sum = 0;
-        for (IntArrayList iter : index.tailMap(threshold + 1).values()) {
-            for (int rowId : iter) {
-                for (int colId = 0; colId < numCols; colId++) {
-                    sum += getIntField(rowId, colId);
-                }
+        for (int rowId = 0; rowId < numRows; rowId++) {
+            if (getIntField(rowId, 0) <= threshold) {
+                continue;
             }
+            sum += rowSums[rowId];
         }
         return sum;
     }
@@ -137,11 +134,12 @@ public class CustomTable implements Table {
     @Override
     public int predicatedUpdate(int threshold) {
         int updatedRows = 0;
-        for (IntArrayList iter : index.headMap(threshold).values()) {
-            updatedRows += iter.size();
-            for (int rowId : iter) {
-                putIntField(rowId, 3, getIntField(rowId, 2) + getIntField(rowId, 3));
+        for (int rowId = 0; rowId < numRows; rowId++) {
+            if (getIntField(rowId, 0) >= threshold) {
+                continue;
             }
+            updatedRows++;
+            putIntField(rowId, 3, getIntField(rowId, 2) + getIntField(rowId, 3));
         }
         return updatedRows;
     }
